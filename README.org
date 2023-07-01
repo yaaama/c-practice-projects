@@ -1,0 +1,9 @@
+* Random programs written in C
+
+
+** Simple clock
+- Program that takes the time from the user, and then prints the time second by second.
+
+*** Problems
+- [ ] =C-c= does not seem to terminate it when it is within its loop for some reason.
+- [ ] Have not fully tested all edge cases yet.

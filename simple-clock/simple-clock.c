@@ -76,15 +76,13 @@ int main() {
                                    with Control C */
 
   Time time = {};
-  int delay = 1000;               /* Delay will be 1000 ms (1 second) */
   char *sleepCommand = "sleep 1"; /* Sleep command for 1 second */
 
-  char meridInp[3];
   while (1) {
 
     printf(
         "Please enter the current time in the format HOUR MIN SECOND AM/PM \n");
-    int correctInp = scanf("%d %d %d %s", &time.hour, &time.minute,
+    int correctInp = scanf("%2d%2d%2d%2s", &time.hour, &time.minute,
                            &time.second, time.meridiem);
 
     if (correctInp != 4) {

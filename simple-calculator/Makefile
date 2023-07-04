@@ -1,35 +1,28 @@
-##
-# General purpose makefile for this folder
-#
-# @file
-# @version 0.1
-#
+# specify your source files here
+SRCS = $(wildcard *.c)
+
+# specify your object files here
+OBJS = $(addprefix build/,$(notdir $(SRCS:.c=.o)))
+
+# specify your compiler flags here
+CFLAGS = -Wall -Wextra -g -std=c11
+
+# specify your compiler
 CC = gcc
-CFLAGS = -Wall -g -std=c11
-SRCS = calculator.c
-OBJDIR = build
-OBJS = $(OBJDIR)/$(notdir $(SRCS:.c=.o))
 
+# default command to compile your program
+all: build/my_program
 
-.PHONY: all clean
-
-all: $(OBJDIR) $(basename $(SRCS))
-
-
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
-
-$(OBJDIR)/%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-$(basename $(SRCS)): $(OBJS)
+build/my_program: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
+build/%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# a command to clean up your build directory
 clean:
-	rm -rf $(OBJDIR) $(basename $(SRCS))
+	rm -f build/*
 
-run: $(basename $(SRCS))
-	./$(basename $(SRCS))
-
-
-# end
+# a command to run your program
+run: build/my_program
+	./build/my_program

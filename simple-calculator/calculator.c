@@ -20,11 +20,12 @@ StackNode *stack_push(Stack *stack, Datum newElem, ELEMENT_TYPE elemType) {
       exit(1);
     }
 
-    /* If we were given an empty stack then we should set the size to 0 */
+    /* If we were given an empty stack then we should set the size to 1 now */
     stack->size = 1;
     newNode->data = newElem;
     newNode->type = elemType;
     newNode->nextElem = NULL;
+    stack->top = newNode;
     return newNode;
   }
 
@@ -66,6 +67,42 @@ StackNode *stack_pop(Stack *stack) {
   return stack->top;
 }
 
+
+void print_stack(Stack *stack) {
+
+  StackNode *node = stack->top;
+  StackNode *temp = NULL;
+
+  printf("Top -> ");
+
+
+  while (node != NULL) {
+
+    printf("%d -> " , node->data.operand);
+
+    node = node->nextElem;
+
+      }
+
+    printf("\n");
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*  So we will have an expression such as: ((2 * 4 * 6)/ 3) + 100
    We want to then parse the expression into its simple parts and
   work on them individually and return an answer. */
@@ -90,6 +127,9 @@ double add(int k, ...) {
 
   return total;
 }
+
+
+
 
 double operate(int k, char *expr) {
 

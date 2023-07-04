@@ -1,9 +1,17 @@
 * Random programs written in C
 
+** Calculator <04-07-2023 Tue>
+- Calculator that will take an expression and then return a result.
+- Implementing a stack in order to convert the expression into post-fix notation.
+
+** Singly linked list: <02-07-2023 Sun>
+- Easy project that implements a linked list.
+- Over-engineered it compared to the tutorial because its more complicated that way and I can learn more.
+- Have not made it bug resistant because it relies on the user to give correct data.
 
 ** Simple clock
 - Program that takes the time from the user, and then prints the time second by second.
 
 *** Problems
-- [ ] =C-c= does not seem to terminate it when it is within its loop for some reason.
-- [ ] Have not fully tested all edge cases yet.
+- =C-c= does not seem to terminate it when it is within its loop for some reason.
+- Have not fully tested all edge cases yet.

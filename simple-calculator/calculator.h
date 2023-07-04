@@ -1,6 +1,8 @@
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdbool.h>
+#ifndef CALCULATOR_H
+#define CALCULATOR_H
+
+
+
 
 /* General mathematical functions */
 
@@ -19,6 +21,8 @@ double divide(int k, ...);
 
 
 
+
+
 /* Stack world! */
 
 typedef enum  {
@@ -32,8 +36,8 @@ typedef union {
 } Datum;
 
 typedef struct {
- Datum data;
-ELEMENT_TYPE type;
+ char symbol;
+/* ELEMENT_TYPE type; */
  void *nextElem;
 } StackNode;
 
@@ -44,10 +48,12 @@ typedef struct {
 } Stack;
 
 
-/* Pushing an element on the stack */
-StackNode *stack_push(Stack *stack, Datum data, ELEMENT_TYPE type);
+/* Pushing an element on the stack.
+  MALLOC used. */
+StackNode *stack_push(Stack *stack, char symbol);
 
-/* Popping the stack */
+/* Popping the stack
+   FREES popped node. */
 StackNode *stack_pop(Stack *stack);
 
 /* Viewing the top element in the stack */
@@ -59,5 +65,15 @@ bool stack_is_empty(Stack *stack);
 /* Size of stack */
 int stack_size(Stack *stack);
 
+/* Will destroy and free up all of the stack memory
+  Will return 1 if success, else NULL
+ TODO Implement this */
+int destroy_stack(Stack *stack);
+
 /* Printing elements of the stack */
 void print_stack(Stack *stack);
+
+/* TODO Remove from this header file later */
+char *convert_to_postfix(char *expr, int size);
+
+#endif //CALCULATOR_H

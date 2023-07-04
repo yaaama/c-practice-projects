@@ -1,14 +1,14 @@
-#include "calculator.h"
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "calculator.h"
 
 /*  Stack data structure */
 
+StackNode *stack_push(Stack *stack, char elem) {
 
-StackNode *stack_push(Stack *stack, Datum newElem, ELEMENT_TYPE elemType) {
-
-/* Checking if the stack is null (no elements) */
+  /* Checking if the stack is null (no elements) */
   if (stack->top == NULL) {
 
     /* Create a new node*/
@@ -22,8 +22,8 @@ StackNode *stack_push(Stack *stack, Datum newElem, ELEMENT_TYPE elemType) {
 
     /* If we were given an empty stack then we should set the size to 1 now */
     stack->size = 1;
-    newNode->data = newElem;
-    newNode->type = elemType;
+    newNode->symbol = elem;
+    /* newNode->type = elemType; */
     newNode->nextElem = NULL;
     stack->top = newNode;
     return newNode;
@@ -31,8 +31,8 @@ StackNode *stack_push(Stack *stack, Datum newElem, ELEMENT_TYPE elemType) {
 
   /* If stack was not empty... */
   StackNode *newNode = malloc(sizeof(StackNode));
-  newNode->data = newElem;
-  newNode->type = elemType;
+  newNode->symbol = elem;
+  /* newNode->type = elemType; */
   stack->size += 1;
 
   /* Swap the current top node pointer to the new element being pushed on top */
@@ -44,7 +44,35 @@ StackNode *stack_push(Stack *stack, Datum newElem, ELEMENT_TYPE elemType) {
   return newNode;
 }
 
+char stack_pop_c(Stack *stack) {
 
+  StackNode *currTop = stack->top;
+
+  StackNode *newTop = currTop->nextElem;
+
+  if (currTop == NULL) {
+    printf("Stack is empty already!\n");
+    return 0;
+  }
+
+  char retChar = currTop->symbol;
+
+  printf("Popping element -> %c\n ", currTop->symbol);
+
+  /* The stack top pointer should point to the next element down */
+  stack->top = newTop;
+
+  /* Freeing the memory associated with the previous top */
+  free(currTop);
+
+  /* Decrementing size */
+  stack->size -= 1;
+
+  print_stack(stack);
+
+  /* Returning the new top element in the stack */
+  return retChar;
+}
 
 StackNode *stack_pop(Stack *stack) {
 
@@ -57,16 +85,50 @@ StackNode *stack_pop(Stack *stack) {
     return NULL;
   }
 
+  printf("Popping element -> %c\n ", currTop->symbol);
+
   /* The stack top pointer should point to the next element down */
   stack->top = newTop;
 
   /* Freeing the memory associated with the previous top */
   free(currTop);
 
+  /* Decrementing size */
+  stack->size -= 1;
+
+  print_stack(stack);
+
   /* Returning the new top element in the stack */
   return stack->top;
 }
 
+StackNode *stack_peek(Stack *stack) {
+
+  if (stack->top == NULL) {
+    printf("Stack is empty! Cannot peek.");
+    return NULL;
+  }
+
+  return stack->top;
+}
+
+bool stack_is_empty(Stack *stack) {
+
+  if (stack->top == NULL) {
+    return true;
+  }
+
+  return false;
+}
+
+int stack_size(Stack *stack) {
+
+  if ((stack == NULL) || (stack->top == NULL)) {
+    return 0;
+  }
+
+  return stack->size;
+}
 
 void print_stack(Stack *stack) {
 
@@ -75,33 +137,129 @@ void print_stack(Stack *stack) {
 
   printf("Top -> ");
 
-
   while (node != NULL) {
 
-    printf("%d -> " , node->data.operand);
+    printf("%c -> ", (char)node->symbol);
 
     node = node->nextElem;
+  }
 
-      }
-
-    printf("\n");
-
+  printf("\n");
 }
 
+int precedence(char operator) {
 
+  switch (operator) {
+  case '*':
+    return 1;
+  case '/':
+    return 1;
+  case '-':
+    return 0;
+  case '+':
+    return 0;
+  case '(':
+    return 0;
+  case ')':
+    return 2;
+  default:
+    return -1;
+  }
+}
 
+bool is_operator(char c) {
 
+  switch (c) {
+  case '+':
+  case '*':
+  case '/':
+  case '-':
+  case '(':
+  case ')':
+    printf("%c it is an operator\n", c);
+    return true;
+  }
 
+  return false;
+}
 
+/* Function that parses the expression given,
+   collects result in POSTFIX notation
+   MALLOC's */
+char *convert_to_postfix(char *expr, int size) {
 
+  char *postfix =
+      malloc(sizeof(char) * (size + 1)); /* size+1 used for null char */
 
+  Stack *stack = malloc(sizeof(Stack));
 
+  /* Precedence is -1 because stack is empty! */
+  int stackPrec = -1;
 
+  int c = 0;
 
+  for (int i = 0; i < size; i++) {
 
+    char currentChar = expr[i];
+    int currentPrec = precedence(currentChar);
 
+    if (!is_operator(currentChar)) {
+      postfix[c] = currentChar;
+      printf("Appending %c to postfix[%d]\n", (char)currentChar, c);
+      c += 1;
+    } else {
+      if (currentPrec > stackPrec) {
+        printf("%c is higher than whatever is on the stack\n", currentChar);
+        stack_push(stack, currentChar);
+        printf("Pushing symbol: %c\n", (char)currentChar);
+      }
+    }
+  }
 
+  print_stack(stack);
 
+  const int finalStackSize = stack->size;
+  for (int i = 0; i < finalStackSize; i++) {
+    char app = stack_pop_c(stack);
+    printf("Popped %c from the stack\n", app);
+    postfix[c + i] = app;
+    printf("Appending %c to postfix[%d]\n", (char)app, c);
+  }
+
+  print_stack(stack);
+
+  /* DESTROY_STACK */
+
+  printf("Here is the final string: ");
+
+  for (int i = 0; i < size; i++) {
+    printf("%c", (char)postfix[i]);
+  }
+
+  postfix[size + 1] = '\0';
+
+  return postfix;
+}
+
+/***********************/
+/* /\* Extra stuff *\/ */
+/***********************/
+
+void print_string(char *str, int size) {
+
+  for (int i = 0; i < size;) {
+    printf("%c", (char)str[i]);
+  }
+
+  printf("\n");
+}
+
+double operate(int k, char *expr) {
+
+  double total = 0;
+
+  return total;
+}
 
 /*  So we will have an expression such as: ((2 * 4 * 6)/ 3) + 100
    We want to then parse the expression into its simple parts and
@@ -124,16 +282,6 @@ double add(int k, ...) {
   }
 
   va_end(argList);
-
-  return total;
-}
-
-
-
-
-double operate(int k, char *expr) {
-
-  double total = 0;
 
   return total;
 }

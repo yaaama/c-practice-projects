@@ -228,17 +228,35 @@ char *convert_to_postfix(char *expr, int size) {
 
   print_stack(stack);
 
-  /* DESTROY_STACK */
-
-  printf("Here is the final string: ");
-
-  for (int i = 0; i < size; i++) {
-    printf("%c", (char)postfix[i]);
+  /* Freeing up the memory for the stack */
+  if (destroy_stack(stack) == 0) {
+    printf("Stack could not be destroyed, system exiting...");
+    exit(1);
   }
 
+  /* Placing null terminator at the end */
   postfix[size + 1] = '\0';
 
+  printf("Here is the final string:\n");
+  print_string(postfix, size);
+
+
+
   return postfix;
+}
+
+
+int destroy_stack(Stack *stack) {
+
+  if (stack == NULL) {
+
+    printf("Stack is NULL! Cannot destroy, returning error...\n");
+    return 0;
+  }
+
+  free(stack);
+
+  return 1;
 }
 
 /***********************/
@@ -247,8 +265,8 @@ char *convert_to_postfix(char *expr, int size) {
 
 void print_string(char *str, int size) {
 
-  for (int i = 0; i < size;) {
-    printf("%c", (char)str[i]);
+  for (int i = 0; i < size; i ++) {
+    printf("%c", str[i]);
   }
 
   printf("\n");

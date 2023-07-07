@@ -73,6 +73,9 @@ int destroy_stack(Stack *stack);
 /* Printing elements of the stack */
 void print_stack(Stack *stack);
 
+/* Prints a string to standard output */
+void print_string(char *str, int size);
+
 /* TODO Remove from this header file later */
 char *convert_to_postfix(char *expr, int size);
 

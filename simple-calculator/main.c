@@ -33,9 +33,9 @@ int main(int argc, char *argv[]) {
 
 
 
-  char *expr = "A+B+C*D+E";
+  char *expr = "(A+B)+(C*D)+E";
 
-  char *newExpr = convert_to_postfix(expr, 9);
+  char *newExpr = convert_to_postfix(expr, 13);
 
 
 

@@ -26,31 +26,29 @@ double divide(int k, ...);
 /* Stack world! */
 
 typedef enum  {
-  OPERAND, OPERATOR, PARENS
+  OPERAND, OPERATOR
 } ELEMENT_TYPE;
 
 typedef union {
   int operand;
   char op;
-  char paren;
 } Datum;
 
 typedef struct {
- char symbol;
-/* ELEMENT_TYPE type; */
+ Datum symbol;
+ELEMENT_TYPE type;
  void *nextElem;
 } StackNode;
 
 typedef struct {
   StackNode *top;
   int size;
-  /* int empty; */
 } Stack;
 
 
 /* Pushing an element on the stack.
   MALLOC used. */
-StackNode *stack_push(Stack *stack, char symbol);
+StackNode *stack_push(Stack *stack, void *datum, ELEMENT_TYPE type);
 
 /* Popping the stack
    FREES popped node. */
@@ -77,6 +75,6 @@ void print_stack(Stack *stack);
 void print_string(char *str, int size);
 
 /* TODO Remove from this header file later */
-char *convert_to_postfix(char *expr, int size);
+Stack *convert_to_postfix(char *expr, int size);
 
 #endif //CALCULATOR_H

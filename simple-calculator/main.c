@@ -17,34 +17,34 @@ int main(int argc, char *argv[]) {
   printf("Creating new stack!\n");
   Stack *stack = malloc(sizeof(Stack));
 
-  char symbols[] = "+-/";
+  /* char symbols[] = "+-/"; */
 
-  Datum data[3];
-  Datum symb[3];
+  /* Datum data[3]; */
+  /* Datum symb[3]; */
 
-  for (int i = 0; i < 3; i++ ) {
-    data[i].operand = (i + 4);
-    symb[i].op = symbols[i];
+  /* for (int i = 0; i < 3; i++ ) { */
+  /*   data[i].operand = (i + 4); */
+  /*   symb[i].op = symbols[i]; */
 
-  }
+  /* } */
 
-  for (int i = 0; i < 3 ; i ++ ) {
+  /* for (int i = 0; i < 3 ; i ++ ) { */
 
-  stack_push(stack, &data[i], OPERAND);
-  stack_push(stack, &symb[i], OPERATOR);
-  }
+  /* stack_push(stack, data[i].operand, OPERAND); */
+  /* stack_push(stack, symb[i]., OPERATOR); */
+  /* } */
 
-  printf("Stack size: %d \n", stack_size(stack) );
-  printf("Stack empty?: %d \n", stack_is_empty(stack) );
+  /* printf("Stack size: %d \n", stack_size(stack) ); */
+  /* printf("Stack empty?: %d \n", stack_is_empty(stack) ); */
 
-  destroy_stack(stack);
-
-
+  /* destroy_stack(stack); */
 
 
-  /* char expr[] = " 1 + 4 * 3"; */
 
-  /* convert_to_postfix(expr, strlen(expr)); */
+
+  char expr[] = "10 + 20 * 30 - 40 / 50";
+
+  convert_to_postfix(expr, strlen(expr) + 1);
 
   /* /\* convert_to_postfix(expr, strlen(expr)); *\/ */
 

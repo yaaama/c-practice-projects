@@ -46,9 +46,16 @@ typedef struct {
 } Stack;
 
 
+int precedence (char op);
+
+bool is_digit (char c);
+
+bool is_operator (char c);
+
+
 /* Pushing an element on the stack.
   MALLOC used. */
-StackNode *stack_push(Stack *stack, void *datum, ELEMENT_TYPE type);
+StackNode *stack_push(Stack *stack, Datum datum, ELEMENT_TYPE type);
 
 /* Popping the stack
    FREES popped node. */

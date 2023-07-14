@@ -14,8 +14,8 @@ int main(int argc, char *argv[]) {
   /* Testing adding function */
   /* printf("Total: %f\n", add(5, (double) 1, 2.0, 3.0, 4.0, 5.0) ); */
   /* Stack push test... */
-  printf("Creating new stack!\n");
-  Stack *stack = malloc(sizeof(Stack));
+  /* printf("Creating new stack!\n"); */
+  /* Stack *stack = malloc(sizeof(Stack)); */
 
   /* char symbols[] = "+-/"; */
 
@@ -44,8 +44,9 @@ int main(int argc, char *argv[]) {
 
   char expr[] = "10 + 20 * 30 - 40 / 50";
 
-  convert_to_postfix(expr, strlen(expr) + 1);
+  Stack *stack = postfix_conversion(expr, strlen(expr) + 1);
 
+  postfix_evaluate(stack);
   /* /\* convert_to_postfix(expr, strlen(expr)); *\/ */
 
   /* char str[] = "20.30300 + 2.444"; */

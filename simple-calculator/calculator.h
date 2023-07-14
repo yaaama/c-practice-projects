@@ -82,6 +82,11 @@ void print_stack(Stack *stack);
 void print_string(char *str, int size);
 
 /* TODO Remove from this header file later */
-Stack *convert_to_postfix(char *expr, int size);
+Stack *postfix_conversion(char *expr, int size);
+
+/* Evaluating the expression returned from convert_to_postfix */
+int postfix_evaluate(Stack *expr);
+
+
 
 #endif //CALCULATOR_H

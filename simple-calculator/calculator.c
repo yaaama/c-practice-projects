@@ -107,7 +107,6 @@ StackNode *stack_push(Stack *stack, Datum datum, ELEMENT_TYPE type) {
     exit(0);
   }
 
-  Datum temp;
   switch (type) {
   case OPERAND: {
     push_number(stack, datum.operand);
@@ -199,18 +198,84 @@ void expr_remove_parens(char *restrict untrimmedStr,
   *trimmedStr = '\0';
 }
 
-void free_string_mem(char *str, int length) {
+int calc_operation(char operator, int a, int b) {
 
-  for (int i = 0; i < length; i++) {
-    free(str);
-    str++;
+  switch (operator) {
+  case '+':
+    return (a + b);
+  case '-':
+    return (a - b);
+  case '*':
+    return (a * b);
+  case '/':
+    return (a / b);
+  default:
+    break;
   }
+
+  return 0;
 }
 
-int postfix_evaluate(Stack *expr) { return 0; }
+Stack *reverse_stack(Stack *stack) {
+
+  Stack *tempStack = malloc(sizeof(Stack));
+  tempStack->size = 0;
+  tempStack->top = NULL;
+
+  while (!stack_is_empty(stack)) {
+    Datum toPush = stack->top->symbol;
+    ELEMENT_TYPE type = stack->top->type;
+    stack_pop(stack);
+    stack_push(tempStack, toPush, type);
+  }
+
+  return tempStack;
+}
+
+int postfix_evaluate(Stack *expression) {
+
+  Stack *expr = reverse_stack(expression);
+  Stack *resultStack = malloc(sizeof(Stack));
+
+  resultStack->size = 0;
+  resultStack->top = NULL;
+
+  printf("\n\nEvaluation of postfix is starting...\n");
+  while (!stack_is_empty(expr)) {
+
+    StackNode *currNode = stack_peek(expr);
+
+    if (currNode->type == OPERAND) {
+      stack_push(resultStack, currNode->symbol, OPERAND);
+
+      stack_pop(expr);
+      continue;
+
+    } else if (currNode->type == OPERATOR) {
+
+      int a = stack_peek(resultStack)->symbol.operand;
+      stack_pop(resultStack);
+      int b = stack_peek(resultStack)->symbol.operand;
+      stack_pop(resultStack);
+      int result = calc_operation(currNode->symbol.op, b, a);
+      printf("%d %c %d = %d", b, currNode->symbol.op, a, result);
+
+      if (result == 0) {
+        continue;
+      }
+
+      Datum resultD = {.operand = result};
+      stack_push(resultStack, resultD, OPERAND);
+      stack_pop(expr);
+    }
+  }
+  int answer = resultStack->top->symbol.operand;
+  printf("Answer is :\t%d", answer);
+  return answer;
+}
 
 /* Converts given string into a postfix expression */
-Stack *convert_to_postfix(char *expr, int length) {
+Stack *postfix_conversion(char *expr, int length) {
 
   char *wsRemoved = malloc(sizeof(char) * (length + 1));
   expr_remove_whitespace(expr, wsRemoved); /* Removes the whitespace */
@@ -230,14 +295,13 @@ Stack *convert_to_postfix(char *expr, int length) {
 
   int currentNumber;
   char currentChar;
-  int place = 0;
 
   for (size_t i = 0; i < leng; i++) {
 
     currentNumber = 0;
     currentChar = cleanExpr[i];
 
-    if(currentChar == '\0') {
+    if (currentChar == '\0') {
       break;
     }
 
@@ -253,8 +317,7 @@ Stack *convert_to_postfix(char *expr, int length) {
       stack_push(postfixStack, temp, OPERAND);
       i--;
 
-
-                                /* When the scanned character is an operator */
+      /* When the scanned character is an operator */
     } else if (is_operator(currentChar)) {
 
       if (tempStack->top == NULL) {
@@ -272,19 +335,18 @@ Stack *convert_to_postfix(char *expr, int length) {
 
         Datum temp = stack_peek(tempStack)->symbol;
         Datum nextDatum = {.op = currentChar};
-        /* Pop op stack that has either the same or higher precedence than the current op (charPrec) */
-        while(charPrec <= tempTopPrec && !stack_is_empty(tempStack)) {
+        /* Pop op stack that has either the same or higher precedence than the
+         * current op (charPrec) */
+        while (charPrec <= tempTopPrec && !stack_is_empty(tempStack)) {
 
-        stack_push(postfixStack, temp, OPERATOR);
+          stack_push(postfixStack, temp, OPERATOR);
 
-        stack_pop(tempStack);
+          stack_pop(tempStack);
 
-        if(stack_peek(tempStack) != NULL) {
-        tempTopPrec = precedence(stack_peek(tempStack) ->symbol.op);
-        temp = stack_peek(tempStack)->symbol;
-        }
-
-
+          if (stack_peek(tempStack) != NULL) {
+            tempTopPrec = precedence(stack_peek(tempStack)->symbol.op);
+            temp = stack_peek(tempStack)->symbol;
+          }
         }
         stack_push(tempStack, nextDatum, OPERATOR);
       } else {
@@ -301,18 +363,20 @@ Stack *convert_to_postfix(char *expr, int length) {
 
     char tempOperator = stack_peek(tempStack)->symbol.op;
     Datum tempDatum = {.op = tempOperator};
-    stack_pop(tempStack);
     stack_push(postfixStack, tempDatum, OPERATOR);
+    stack_pop(tempStack);
   }
 
   printf("Postfix stack:\t");
   print_stack(postfixStack);
 
+  /* Freeing memory */
   destroy_stack(tempStack);
+  free(cleanExpr);
+  free(wsRemoved);
 
   return postfixStack;
 }
-
 
 int destroy_stack(Stack *stack) {
 
@@ -383,7 +447,6 @@ int stack_size(Stack *stack) {
 void print_stack(Stack *stack) {
 
   StackNode *node = stack->top;
-  StackNode *temp = NULL;
 
   printf("Stack:\tTop -> ");
 

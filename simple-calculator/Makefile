@@ -5,13 +5,13 @@ SRCS = $(wildcard *.c)
 OBJS = $(addprefix build/,$(notdir $(SRCS:.c=.o)))
 
 # specify your compiler flags here
-CFLAGS = -Wall -g -std=c11
+CFLAGS = -Wall -ggdb -std=c11 
 
 # specify your compiler
 CC = gcc
 
 # default command to compile your program
-all: build/Calculator
+all: build/my_program
 
 build/my_program: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^

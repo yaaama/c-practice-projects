@@ -4,65 +4,74 @@
 #include <string.h>
 #include <stdarg.h>
 #include "calculator.h"
+/* #include "zlog.h" */
 
+void print_user_options() {
 
+  printf("The options you have available to you are:\n");
+  printf("\t1: Quit\n");
+  printf("\t2: Evaluate an expression.\n");
+  printf("\t3: Show help.\n");
+}
 
+void expression_handler(char *input) {
 
-
+  Stack *stack = postfix_conversion(input, strlen(input));
+  postfix_evaluate(stack);
+}
 
 int main(int argc, char *argv[]) {
-  /* Testing adding function */
-  /* printf("Total: %f\n", add(5, (double) 1, 2.0, 3.0, 4.0, 5.0) ); */
-  /* Stack push test... */
-  /* printf("Creating new stack!\n"); */
-  /* Stack *stack = malloc(sizeof(Stack)); */
 
-  /* char symbols[] = "+-/"; */
+  char *expression = NULL; /* This is where the expression will be stored */
+  size_t expSize = 0;
+  size_t chars_read;
 
-  /* Datum data[3]; */
-  /* Datum symb[3]; */
+  printf("Welcome! This is a simple calculator you can use to evaluate "
+         "expressions.\n");
 
-  /* for (int i = 0; i < 3; i++ ) { */
-  /*   data[i].operand = (i + 4); */
-  /*   symb[i].op = symbols[i]; */
+  int option;
+  bool exprValid = false;
 
-  /* } */
+  while (option != 1) {
 
-  /* for (int i = 0; i < 3 ; i ++ ) { */
+    print_user_options();
 
-  /* stack_push(stack, data[i].operand, OPERAND); */
-  /* stack_push(stack, symb[i]., OPERATOR); */
-  /* } */
+    char *tmp;
+    size_t optionSize = 0;
 
-  /* printf("Stack size: %d \n", stack_size(stack) ); */
-  /* printf("Stack empty?: %d \n", stack_is_empty(stack) ); */
+    int success = getline(&tmp, &optionSize, stdin);
+    int option = atoi(tmp);
 
-  /* destroy_stack(stack); */
+    /* Will return if input is not correct */
+    if (success < 0) {
+      printf("Incorrect input, closing program.\n");
+      return 1;
+    }
 
+    switch (option) {
+    case 1:
+      printf("See ya buddy.\n");
+      exit(1);
 
+    case 2:
+      printf("Please enter the expression you would like to evaluate:\n");
+      chars_read = getline(&expression, &expSize, stdin);
+      printf("expression read: %s\n", expression);
 
-
-  char expr[] = "10 + 20 * 30 - 40 / 50";
-
-  Stack *stack = postfix_conversion(expr, strlen(expr) + 1);
-
-  postfix_evaluate(stack);
-  /* /\* convert_to_postfix(expr, strlen(expr)); *\/ */
-
-  /* char str[] = "20.30300 + 2.444"; */
-  /*  char *ptr; */
-  /*  double ret; */
-
-  /*  ret = strtod(str, &ptr); */
-  /*  double second = strtod(ptr+2, &ptr ); */
-  /*  printf("The number(double) is %lf\n", ret); */
-  /*  printf("String part is |%s|\n", ptr); */
-  /*  printf("Second part is %lf\n", second); */
-
-
-
-
-
+      if (chars_read < 0) {
+        printf("couldn't read the input\n");
+        free(expression);
+        return 1;
+      } else {
+        expression_handler(expression);
+        continue;
+      }
+      break;
+    case 3:
+      print_user_options();
+      break;
+    }
+  }
 
   return 0;
 }

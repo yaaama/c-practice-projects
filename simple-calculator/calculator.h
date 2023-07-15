@@ -1,33 +1,11 @@
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
 
-
-
-
 /* General mathematical functions */
-
-/*  Will include helpful functions */
-double add (int k, ...);
-
-/* Will subtract k number of arguments from each other*/
-double subtract(int k, ...);
-
-/* Will multiply k number of arguments from each other*/
-double multiply(int k, ...);
-
-/* Will divide k number of arguments */
-double divide(int k, ...);
-
-
-
-
-
 
 /* Stack world! */
 
-typedef enum  {
-  OPERAND, OPERATOR
-} ELEMENT_TYPE;
+typedef enum { OPERAND, OPERATOR } ELEMENT_TYPE;
 
 typedef union {
   int operand;
@@ -35,9 +13,9 @@ typedef union {
 } Datum;
 
 typedef struct {
- Datum symbol;
-ELEMENT_TYPE type;
- void *nextElem;
+  Datum symbol;
+  ELEMENT_TYPE type;
+  void *nextElem;
 } StackNode;
 
 typedef struct {
@@ -45,13 +23,11 @@ typedef struct {
   int size;
 } Stack;
 
+int precedence(char op);
 
-int precedence (char op);
+bool is_digit(char c);
 
-bool is_digit (char c);
-
-bool is_operator (char c);
-
+bool is_operator(char c);
 
 /* Pushing an element on the stack.
   MALLOC used. */
@@ -62,13 +38,13 @@ StackNode *stack_push(Stack *stack, Datum datum, ELEMENT_TYPE type);
 StackNode *stack_pop(Stack *stack);
 
 /* Viewing the top element in the stack */
-StackNode *stack_peek(Stack *stack);
+StackNode *stack_peek(const Stack *stack);
 
 /* Seeing if stack is empty */
-bool stack_is_empty(Stack *stack);
+bool stack_is_empty(const Stack *stack);
 
 /* Size of stack */
-int stack_size(Stack *stack);
+int stack_size(const Stack *stack);
 
 /* Will destroy and free up all of the stack memory
   Will return 1 if success, else NULL
@@ -78,15 +54,10 @@ int destroy_stack(Stack *stack);
 /* Printing elements of the stack */
 void print_stack(Stack *stack);
 
-/* Prints a string to standard output */
-void print_string(char *str, int size);
-
 /* TODO Remove from this header file later */
 Stack *postfix_conversion(char *expr, int size);
 
 /* Evaluating the expression returned from convert_to_postfix */
 int postfix_evaluate(Stack *expr);
 
-
-
-#endif //CALCULATOR_H
+#endif // CALCULATOR_H

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "calculator.h"
+#include "zlog.h"
 
 /* Numb of elements allowed in a single stack */
 #define STACK_LIM 100
@@ -36,7 +37,7 @@ bool is_operator(char c) {
   case '-':
   case '(':
   case ')':
-    printf("%c it is an operator\n", c);
+    /* printf("%c it is an operator\n", c); */
     return true;
   }
 
@@ -56,7 +57,7 @@ bool is_digit(char c) {
   case '7':
   case '8':
   case '9':
-    printf("%c is a digit.\n", c);
+    /* printf("%c is a digit.\n", c); */
     return true;
   }
 
@@ -77,7 +78,7 @@ void push_character(Stack *stack, char datum) {
   newNode->nextElem = tempNode;
   stack->top = newNode;
 
-  printf("Pushed char %c to stack.\n", stack->top->symbol.op);
+  /* printf("Pushed char %c to stack.\n", stack->top->symbol.op); */
 }
 
 void push_number(Stack *stack, int datum) {
@@ -93,7 +94,8 @@ void push_number(Stack *stack, int datum) {
   newNode->nextElem = tempNode;
   stack->top = newNode;
 
-  printf("Pushed integer %d to stack.\n", (int)stack->top->symbol.operand);
+  /* printf("Pushed integer %d to stack.\n", (int)stack->top->symbol.operand);
+   */
 }
 
 StackNode *stack_push(Stack *stack, Datum datum, ELEMENT_TYPE type) {
@@ -102,7 +104,7 @@ StackNode *stack_push(Stack *stack, Datum datum, ELEMENT_TYPE type) {
     printf("Stack is empty!\n");
   }
 
-  if (stack->size == STACK_LIM) {
+  if (stack_size(stack) == STACK_LIM) {
     printf("Stack size is full! Exiting.");
     exit(0);
   }
@@ -124,23 +126,17 @@ StackNode *stack_push(Stack *stack, Datum datum, ELEMENT_TYPE type) {
   return stack->top;
 }
 
-/* If the stack is not empty */
-
 StackNode *stack_pop(Stack *stack) {
 
+  /* If the stack is not empty */
   /* New top of the stack will be the next element down */
   StackNode *currTop = stack->top;
   StackNode *newTop = currTop->nextElem;
 
-  if (currTop == NULL) {
-    printf("Stack is empty already!\n");
-    return NULL;
-  }
-
   if (currTop->type == OPERATOR) {
-    printf("Pop -> %c\n", currTop->symbol.op);
+    /* printf("Pop -> %c\n", currTop->symbol.op); */
   } else {
-    printf("Pop -> %d\n", currTop->symbol.operand);
+    /* printf("Pop -> %d\n", currTop->symbol.operand); */
   }
 
   /* The stack top pointer should point to the next element down */
@@ -161,32 +157,32 @@ StackNode *stack_pop(Stack *stack) {
 void expr_remove_whitespace(char *restrict untrimmedStr,
                             char *restrict trimmedStr) {
 
-  printf("Removing whitespace: \n");
+  /* printf("Removing whitespace: \n"); */
   while (*untrimmedStr != '\0') {
 
     if (!isspace(*untrimmedStr)) {
       *trimmedStr = *untrimmedStr;
-      printf("%c", *trimmedStr);
+      /* printf("%c", *trimmedStr); */
       trimmedStr++;
     }
 
     untrimmedStr++;
   }
 
-  printf("\n");
+  /* printf("\n"); */
   *trimmedStr = '\0';
 }
 
 void expr_remove_parens(char *restrict untrimmedStr,
                         char *restrict trimmedStr) {
 
-  printf("Removing parentheses: \n");
+  /* printf("Removing parentheses: \n"); */
   int count = 0;
   while (*untrimmedStr != '\0') {
 
     if (*untrimmedStr != '(' && *untrimmedStr != ')') {
       *trimmedStr = *untrimmedStr;
-      printf("%c", *trimmedStr);
+      /* printf("%c", *trimmedStr); */
       count++;
       trimmedStr++;
     }
@@ -194,11 +190,13 @@ void expr_remove_parens(char *restrict untrimmedStr,
     untrimmedStr++;
   }
 
-  printf("\n");
+  /* printf("\n"); */
   *trimmedStr = '\0';
 }
 
 int calc_operation(char operator, int a, int b) {
+
+  printf("calc_operation:\t%d %c %d", a, operator, b);
 
   switch (operator) {
   case '+':
@@ -208,9 +206,12 @@ int calc_operation(char operator, int a, int b) {
   case '*':
     return (a * b);
   case '/':
+    if (b == 0) {
+      return 0;
+    }
     return (a / b);
   default:
-    break;
+    return 0;
   }
 
   return 0;
@@ -235,6 +236,11 @@ Stack *reverse_stack(Stack *stack) {
 int postfix_evaluate(Stack *expression) {
 
   Stack *expr = reverse_stack(expression);
+  if (stack_size(expr) == 0 || stack_is_empty(expr)) {
+    printf("The answer to this is 0...\n");
+    return 0;
+  }
+
   Stack *resultStack = malloc(sizeof(Stack));
 
   resultStack->size = 0;
@@ -247,7 +253,6 @@ int postfix_evaluate(Stack *expression) {
 
     if (currNode->type == OPERAND) {
       stack_push(resultStack, currNode->symbol, OPERAND);
-
       stack_pop(expr);
       continue;
 
@@ -260,17 +265,13 @@ int postfix_evaluate(Stack *expression) {
       int result = calc_operation(currNode->symbol.op, b, a);
       printf("%d %c %d = %d", b, currNode->symbol.op, a, result);
 
-      if (result == 0) {
-        continue;
-      }
-
       Datum resultD = {.operand = result};
       stack_push(resultStack, resultD, OPERAND);
       stack_pop(expr);
     }
   }
   int answer = resultStack->top->symbol.operand;
-  printf("Answer is :\t%d", answer);
+  printf("Answer is :\t%d\n", answer);
   return answer;
 }
 
@@ -279,12 +280,15 @@ Stack *postfix_conversion(char *expr, int length) {
 
   char *wsRemoved = malloc(sizeof(char) * (length + 1));
   expr_remove_whitespace(expr, wsRemoved); /* Removes the whitespace */
+  printf("postfix_conversion:\tRemoved whitespace:\t%s\n", wsRemoved);
   char *cleanExpr = malloc(sizeof(char) * (length + 1));
   expr_remove_parens(wsRemoved, cleanExpr);
+  printf("postfix_conversion:\tRemoved parens:\t%s\n", cleanExpr);
 
   size_t leng = strlen(cleanExpr);
   leng += 1; /* Accounts for the null terminator */
-  printf("Original length: %d , trimmed length: %zu\n", length, leng);
+  printf("postfix_conversion:\tOriginal length: %d , trimmed length: %zu\n",
+         length, leng);
 
   Stack *postfixStack = malloc(sizeof(Stack));
   postfixStack->size = 0;
@@ -293,15 +297,13 @@ Stack *postfix_conversion(char *expr, int length) {
   tempStack->size = 0;
   tempStack->top = NULL;
 
-  int currentNumber;
-  char currentChar;
-
   for (size_t i = 0; i < leng; i++) {
 
-    currentNumber = 0;
-    currentChar = cleanExpr[i];
+    int currentNumber = 0;
+    char currentChar = cleanExpr[i];
 
-    if (currentChar == '\0') {
+    if (currentChar == '\0') { /* If the char is the null terminator then the
+                                  expression is finished being read  */
       break;
     }
 
@@ -356,7 +358,7 @@ Stack *postfix_conversion(char *expr, int length) {
     }
   }
 
-  printf("Temp stack:\t");
+  printf("postfix_conversion:\tTemp stack:\t");
   print_stack(tempStack);
 
   while (!stack_is_empty(tempStack)) {
@@ -380,10 +382,10 @@ Stack *postfix_conversion(char *expr, int length) {
 
 int destroy_stack(Stack *stack) {
 
-  printf("Destroying stack!\n");
+  /* printf("Destroying stack!\n"); */
   if (stack == NULL) {
 
-    printf("Stack is NULL! Cannot destroy, returning error...\n");
+    /* printf("Stack is NULL! Cannot destroy, returning error...\n"); */
     return 0;
   }
 
@@ -396,46 +398,26 @@ int destroy_stack(Stack *stack) {
   return 1;
 }
 
-/***********************/
-/* /\* Extra stuff *\/ */
-/***********************/
-
-void print_string(char *str, int size) {
-
-  for (int i = 0; i < size; i++) {
-    printf("%c", str[i]);
-  }
-
-  printf("\n");
-}
-
-double operate(int k, char *expr) {
-
-  double total = 0;
-
-  return total;
-}
-
-StackNode *stack_peek(Stack *stack) {
+StackNode *stack_peek(const Stack *stack) {
 
   if (stack->top == NULL) {
-    printf("Stack is empty! Cannot peek.");
+    /* printf("Stack is empty! Cannot peek."); */
     return NULL;
   }
 
   return stack->top;
 }
 
-bool stack_is_empty(Stack *stack) {
+bool stack_is_empty(const Stack *stack) {
 
-  if (stack->top == NULL || stack->size == 0) {
+  if (stack->top == NULL || stack_size(stack) == 0) {
     return true;
   }
 
   return false;
 }
 
-int stack_size(Stack *stack) {
+int stack_size(const Stack *stack) {
 
   if ((stack == NULL) || (stack->top == NULL)) {
     return 0;
@@ -446,6 +428,7 @@ int stack_size(Stack *stack) {
 
 void print_stack(Stack *stack) {
 
+  printf("---Printing stack!---\n");
   StackNode *node = stack->top;
 
   printf("Stack:\tTop -> ");
@@ -462,24 +445,4 @@ void print_stack(Stack *stack) {
   }
 
   printf("\n");
-}
-
-/* Will add k number of arguments together */
-double add(int k, ...) {
-
-  double total = 0;
-
-  va_list argList;
-  va_start(argList, k);
-
-  for (int i = 0; i < k; i++) {
-
-    double operand = va_arg(argList, double);
-    total += operand;
-    printf("Current total: %lf\n", total);
-  }
-
-  va_end(argList);
-
-  return total;
 }

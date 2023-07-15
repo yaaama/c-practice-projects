@@ -156,6 +156,7 @@ int main() {
         break;
 
       case 2: {
+
         int dataToAdd = 0;
         printf("Please enter the data you would like to add for the node:\n");
         scanf("%d", &dataToAdd);

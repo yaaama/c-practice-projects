@@ -158,7 +158,7 @@ StackNode *stack_pop(Stack *stack) {
 
 void clean_expr(char *restrict untrimmedStr, char *restrict trimmedStr) {
 
-  printf("Removing parentheses and whitespace...\n");
+  /* printf("Removing parentheses and whitespace...\n"); */
 
   while (*untrimmedStr != '\0') {
 
@@ -237,7 +237,7 @@ Stack *reverse_stack(Stack *stack) {
 int postfix_evaluate(Stack *expression) {
 
   /* The expression we will work on */
-  printf("\nReversing the stack.\n");
+  /* printf("\nReversing the stack.\n"); */
   Stack *expr = reverse_stack(expression);
 
   /* If the stack received is empty then we return 0 */
@@ -252,7 +252,7 @@ int postfix_evaluate(Stack *expression) {
   Stack *resultStack = malloc(sizeof(Stack));
   init_empty_stack(resultStack);
 
-  printf("\n\nEvaluating the post fix expression...\n");
+  /* printf("\n\nEvaluating the post fix expression...\n"); */
   while (!stack_is_empty(expr)) {
 
     /* Current element of the expression */
@@ -285,6 +285,7 @@ int postfix_evaluate(Stack *expression) {
       stack_pop(expr);
     }
   }
+
   int answer = resultStack->top->symbol.operand;
   destroy_stack(resultStack);
   printf("\nResult:\t%d\n\n", answer);
@@ -297,15 +298,15 @@ Stack *postfix_conversion(char *expr, int length) {
   /* Removing whitespace and any parantheses... */
   char *cleanExpr = malloc(sizeof(char) * (length + 1));
   clean_expr(expr, cleanExpr);
-  printf("Cleaned up expression:\t%s\n", cleanExpr);
+  /* printf("Cleaned up expression:\t%s\n", cleanExpr); */
   free(expr);
 
   /* Length of the cleaned up expression */
   size_t exprLeng = strlen(cleanExpr);
   exprLeng += 1; /* Accounts for the null terminator */
 
-  printf("postfix_conversion:\tOriginal length: %d , trimmed length: %zu\n",
-         length, exprLeng);
+  /* printf("postfix_conversion:\tOriginal length: %d , trimmed length: %zu\n", */
+  /*        length, exprLeng); */
 
   Stack *exprStack = malloc(sizeof(Stack));
   init_empty_stack(exprStack);
@@ -381,7 +382,7 @@ Stack *postfix_conversion(char *expr, int length) {
     }
   }
 
-  print_stack(operatorStack, "postfix_conversion::operatorStack");
+  /* print_stack(operatorStack, "postfix_conversion::operatorStack"); */
 
   /* Now just adding in the remaining operators left on the operator stack */
   while (!stack_is_empty(operatorStack)) {
@@ -395,7 +396,7 @@ Stack *postfix_conversion(char *expr, int length) {
     stack_pop(operatorStack);
   }
 
-  print_stack(exprStack, "postfix_conversion::exprStack");
+  /* print_stack(exprStack, "postfix_conversion::exprStack"); */
 
   /* Freeing memory */
   destroy_stack(operatorStack);

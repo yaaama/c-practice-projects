@@ -52,7 +52,7 @@ int stack_size(const Stack *stack);
 int destroy_stack(Stack *stack);
 
 /* Printing elements of the stack */
-void print_stack(Stack *stack);
+void print_stack(Stack *stack, char *name);
 
 /* TODO Remove from this header file later */
 Stack *postfix_conversion(char *expr, int size);
